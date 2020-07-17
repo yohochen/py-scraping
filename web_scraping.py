@@ -1,3 +1,6 @@
+import nltk.corpus          # one time download
+nltk.download('stopwords')  # one time download
+from nltk.corpus import stopwords
 import requests
 import string
 import matplotlib.pyplot as plt
@@ -22,8 +25,9 @@ def filterWaste(word):
     word = word.lower()
     bad_words = ('the', 'a', 'in', 'of', 'to', 'you', '\xa0', 'and', 'at', 'on', 'for', 'from', 'is', 'that', 'are', 'be', '-', 'as', '&', 'they', 'with',
                  'how', 'was', 'her', 'him', 'i', 'has', '|', 'his', '—', '-')
+    stop_words = set(stopwords.words('english'))
 
-    if word in bad_words:
+    if (word in bad_words) or (word in stop_words):
         return False
     elif word in string.punctuation:
         return False
