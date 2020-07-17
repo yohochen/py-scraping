@@ -5,10 +5,23 @@ from bs4 import BeautifulSoup
 from bs4.element import Comment
 from IPython.display import clear_output
 
+def displayResults(words, site):
+    count = [item[1] for item in words][::-1]
+    word = [item[0] for item in words][::-1]
+    plt.figure( figsize=(20, 10) )
+    plt.bar(word, count)
+    plt.title("Analyzing Top Words from : {}...".format(site[:50]), fontname="Sans Serif", fontsize=24)
+    plt.xlabel("Words", fontsize=24)
+    plt.ylabel("# of Appearances", fontsize=24)
+    plt.xticks(fontname="Sans Serif", fontsize=20)
+    plt.yticks(fontname="Sans Serif", fontsize=20)
+
+    plt.show()
+
 def filterWaste(word):
     word = word.lower()
     bad_words = ('the', 'a', 'in', 'of', 'to', 'you', '\xa0', 'and', 'at', 'on', 'for', 'from', 'is', 'that', 'are', 'be', '-', 'as', '&', 'they', 'with',
-                 'how', 'was', 'her', 'him', 'i', 'has', '|', 'his')
+                 'how', 'was', 'her', 'him', 'i', 'has', '|', 'his', '—', '-')
 
     if word in bad_words:
         return False
@@ -55,7 +68,7 @@ while input("Would you like to scrape a website (y/n)? ") == "y":
         top_word = top_words[0]
         print("The top word is: {}".format(top_word[0]))
         print(top_words)
-#         displayResults(top_words, site)
+        displayResults(top_words, site)
     except:
         print("Something went wrong, please try again.")
 print("Thanks for analyzing! Come back again!")
