@@ -21,13 +21,14 @@ def displayResults(words, site):
 
     plt.show()
 
-def filterWaste(word):
+def filterWaste(word, bad_words):  # take in additional param bad_words list to be filtered
     word = word.lower()
-    bad_words = ('the', 'a', 'in', 'of', 'to', 'you', '\xa0', 'and', 'at', 'on', 'for', 'from', 'is', 'that', 'are', 'be', '-', 'as', '&', 'they', 'with',
-                 'how', 'was', 'her', 'him', 'i', 'has', '|', 'his', '—', '-')
+
     stop_words = set(stopwords.words('english'))
 
-    if (word in bad_words) or (word in stop_words):
+    if word in bad_words:
+        return False
+    if word in stop_words:
         return False
     elif word in string.punctuation:
         return False
@@ -43,15 +44,29 @@ def filterTags(element):
         return False
     return True
 
+def get_custom_bad_word():
+    bad_words = ['the', 'a', 'in', 'of', 'to', 'you', '\xa0', 'and', 'at', 'on', 'for', 'from', 'is', 'that', 'are', 'be', '-', 'as', '&', 'they', 'with',
+                 'how', 'was', 'her', 'him', 'i', 'has', '|', 'his', '—', '-']
+
+    prompt = 'Would you like to filter specific word? (y/n)'
+    while input(prompt) == "y" :
+        to_be_filtered = input('Please enter the word to be filtered: ')
+        bad_words.append(to_be_filtered.lower())
+        prompt = 'Would you like to filter another word? (y/n)'
+    return bad_words
+
 def scrape(site):
     page = requests.get(site)
     soup = BeautifulSoup(page.content, "html.parser")
     text = soup.find_all(text=True)
     visible_text = filter(filterTags, text)
     word_count = {}
+
+    bad_words = get_custom_bad_word()
+
     for text in visible_text:
         words = text.replace('\r', '').replace('\n', '').replace('\t', '').split(' ')   # replace all hidden chars
-        words = list(filter(filterWaste, words))
+        words = list(filter(lambda elem: filterWaste(elem, bad_words), words))
 
         for word in words:
             if word != '':
@@ -69,10 +84,12 @@ while input("Would you like to scrape a website (y/n)? ") == "y":
         clear_output()
         site = input("Enter a website to analyze: ")
         top_words = scrape(site)
-        top_word = top_words[0]
-        print("The top word is: {}".format(top_word[0]))
-        print(top_words)
-        displayResults(top_words, site)
+        if not top_words:
+            print("Nothing really found.")
+        else:
+            top_word = top_words[0]
+            print("The top word is: {}".format(top_word[0]))
+            displayResults(top_words, site)
     except:
         print("Something went wrong, please try again.")
 print("Thanks for analyzing! Come back again!")
